@@ -1,2 +1,6 @@
 creditcard.csv 
 creditcard.csv.zip 
+*.bak 
+*.backup 
+*.old 
+*.tmp 
