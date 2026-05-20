@@ -9,6 +9,7 @@ import numpy as np
 import pickle
 import requests
 import urllib.parse
+import re
 import os
 from pathlib import Path
 from sklearn.metrics import (
@@ -44,16 +45,46 @@ FEEDBACK_FILE = PROJECT_DIR / "feedback.text"
 def load_dataset():
     """Load the credit card dataset if it exists."""
     def _download_file(url, target_path):
+        url = url.strip()
+        # fix duplicated protocol mistakes like https://https://
+        if url.startswith('https://https://'):
+            url = url.replace('https://https://', 'https://', 1)
+        if url.startswith('http://http://'):
+            url = url.replace('http://http://', 'http://', 1)
+
         # support Google Drive share links
         if 'drive.google.com' in url:
-            # convert to direct download if possible
             parsed = urllib.parse.urlparse(url)
             if '/file/d/' in parsed.path:
                 file_id = parsed.path.split('/file/d/')[1].split('/')[0]
                 url = f'https://drive.google.com/uc?export=download&id={file_id}'
+            else:
+                query_params = urllib.parse.parse_qs(parsed.query)
+                if 'id' in query_params:
+                    file_id = query_params['id'][0]
+                    url = f'https://drive.google.com/uc?export=download&id={file_id}'
 
-        resp = requests.get(url, stream=True, timeout=60)
+        session = requests.Session()
+        resp = session.get(url, stream=True, timeout=60)
+
+        def _is_html_response(response):
+            content_type = response.headers.get('Content-Type', '')
+            if 'text/html' in content_type:
+                return True
+            if 'application/json' in content_type:
+                return True
+            return False
+
+        if 'drive.google.com' in url and _is_html_response(resp):
+            text = resp.text
+            token_match = re.search(r'confirm=([0-9A-Za-z_\-]+)&', text)
+            if token_match:
+                confirm_token = token_match.group(1)
+                url = f'{url}&confirm={confirm_token}'
+                resp = session.get(url, stream=True, timeout=60)
+
         resp.raise_for_status()
+
         with open(target_path, 'wb') as f:
             for chunk in resp.iter_content(chunk_size=8192):
                 if chunk:
@@ -69,10 +100,42 @@ def load_dataset():
                 return None
 
     # Not found locally — attempt to download from environment-provided URL
+    # 1) Check environment variables (preferred for CI / Streamlit settings)
     data_url = os.environ.get('DATASET_URL') or os.environ.get('CREDITCARD_URL')
+
+    # 2) If not set, check Streamlit `secrets` (TOML) which the UI shows.
+    #    Users often paste values into the Secrets panel like:
+    #      DATASET_URL = "https://..."
+    #    or inside a section:
+    #      [dataset]
+    #      url = "..."
+    try:
+        secrets = getattr(st, 'secrets', {}) or {}
+        if not data_url:
+            # Top-level keys
+            data_url = secrets.get('DATASET_URL') or secrets.get('CREDITCARD_URL')
+
+        if not data_url:
+            # Search nested sections for common keys
+            for v in secrets.values():
+                if isinstance(v, dict):
+                    if 'DATASET_URL' in v:
+                        data_url = v['DATASET_URL']
+                        break
+                    if 'CREDITCARD_URL' in v:
+                        data_url = v['CREDITCARD_URL']
+                        break
+                    # common alt key names
+                    if 'url' in v and isinstance(v['url'], str) and 'credit' in v.get('name', 'creditcard'):
+                        data_url = v['url']
+                        break
+    except Exception:
+        # If secrets are not accessible in this runtime, ignore and rely on env vars
+        pass
     if data_url:
         target = PROJECT_DIR / 'creditcard.csv'
         try:
+            print(f"DATASET_URL used: {data_url}")
             st.info('Dataset not found locally — downloading from provided URL...')
             _download_file(data_url, target)
             df = pd.read_csv(target)
