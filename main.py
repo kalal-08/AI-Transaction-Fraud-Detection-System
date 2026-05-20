@@ -876,23 +876,46 @@ def main():
     st.markdown("""
     <style>
     body {
-        background-color: #0a0f1f;
-        color: #f4f7ff;
+        background-color: #090b16;
+        color: #e6ecff;
+        font-family: Inter, "Segoe UI", sans-serif;
     }
     [data-testid="stApp"],
     [data-testid="stAppViewContainer"],
     .stApp,
-    .stSidebar,
-    .stApp > section,
-    .stApp section {
-        background-color: #0a0f1f !important;
-        color: #f4f7ff !important;
+    .stAppViewContainer,
+    .main,
+    .block-container,
+    .element-container {
+        background-color: #090b16 !important;
+        color: #e6ecff !important;
+    }
+    header.stAppHeader,
+    .stAppHeader {
+        background: linear-gradient(90deg, #111827 0%, #131c2d 100%) !important;
+        border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     }
     .stSidebar {
+        background: #0b1222 !important;
         border-right: 1px solid rgba(255,255,255,0.08) !important;
     }
-    .css-1d391kg, .css-1lcbmhc, .css-1y4p8pa {
-        background-color: #0a0f1f !important;
+    .stAlert,
+    .stAlertContainer {
+        background: rgba(18, 28, 51, 0.94) !important;
+        color: #e6ecff !important;
+        border: 1px solid rgba(255,255,255,0.08) !important;
+        border-radius: 14px !important;
+    }
+    .stButton>button {
+        background: linear-gradient(135deg, #5467ff 0%, #6c84ff 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 10px !important;
+        box-shadow: 0 14px 30px rgba(84, 103, 255, 0.22) !important;
+    }
+    .stButton>button:hover {
+        background: linear-gradient(135deg, #6179ff 0%, #7c8dff 100%) !important;
     }
     [data-testid="stMetricValue"] {
         font-size: 1.8rem;
@@ -902,86 +925,22 @@ def main():
     [data-testid="stMetricDelta"] {
         font-size: 1rem;
         font-weight: 500;
-        color: #d0d8ff;
+        color: #bdd3ff;
     }
-    .main-header {
-        font-size: 2.5rem;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 1rem;
-        color: #f4f7ff;
-    }
-    .hero-section {
-        background: linear-gradient(135deg, #222b45 0%, #2f3d66 100%);
-        padding: 3rem;
-        border-radius: 15px;
-        color: #f4f7ff;
-        margin-bottom: 2rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-    }
-    .hero-title {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 0.5rem;
-        color: #f4f7ff;
-    }
-    .hero-subtitle {
-        font-size: 1.2rem;
-        opacity: 0.9;
-        margin-bottom: 0;
-    }
-    .feature-card {
-        background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
-        padding: 1.5rem;
-        border-radius: 12px;
-        border-left: 5px solid #5b81ff;
-        margin-bottom: 1rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        color: #f4f7ff;
-    }
-    .metric-card {
-        background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
-        padding: 1.5rem;
-        border-radius: 12px;
-        border-top: 4px solid #5b81ff;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        text-align: center;
-        color: #f4f7ff;
-    }
-    .kpi-label {
-        font-size: 0.85rem;
-        color: #9ab7ff;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .kpi-value {
-        font-size: 2rem;
-        font-weight: 800;
-        color: #a5c9ff;
-        margin: 0.5rem 0;
-    }
-    .kpi-subtext {
-        font-size: 0.9rem;
-        color: #b7c5e0;
-    }
-    .stAlert {
-        background-color: rgba(255,255,255,0.06) !important;
-        color: #f4f7ff !important;
-    }
-    .stButton>button {
-        background-color: #4f67ff;
-        color: white;
-        border: none;
-    }
-    .stButton>button:hover {
-        background-color: #667dff;
+    .stMarkdown,
+    .stMarkdown div,
+    .stMarkdown p,
+    .stMarkdown span {
+        color: #e6ecff !important;
     }
     .stDivider {
         border-color: rgba(255,255,255,0.12) !important;
     }
+    .css-1d391kg,
+    .css-1lcbmhc,
+    .css-1y4p8pa,
     .css-10trblm {
-        background-color: #0a0f1f !important;
+        background-color: #090b16 !important;
     }
     </style>
     """, unsafe_allow_html=True)
