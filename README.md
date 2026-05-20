@@ -6,6 +6,8 @@ A comprehensive machine learning application that detects fraudulent credit card
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+[🔗 Live Demo on Streamlit](https://ai-transaction-fraud-detection-system-eospiei2pfesotgjn2lrba.streamlit.app/)
+
 ## 📋 Overview
 
 This is a professional-grade credit card fraud detection system built with Streamlit. It features:
@@ -107,6 +109,13 @@ streamlit run main.py
 ```
 
 The app will open in your default browser at `http://localhost:8501`
+
+### Run the Deployed App
+You can also open the live public app directly:
+
+https://ai-transaction-fraud-detection-system-eospiei2pfesotgjn2lrba.streamlit.app/
+
+If you want to use the deployed version without running locally, just visit that URL.
 
 ## 📊 Project Structure
 
