@@ -7,6 +7,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import pickle
+import requests
+import urllib.parse
 import os
 from pathlib import Path
 from sklearn.metrics import (
@@ -41,6 +43,22 @@ FEEDBACK_FILE = PROJECT_DIR / "feedback.text"
 @st.cache_resource
 def load_dataset():
     """Load the credit card dataset if it exists."""
+    def _download_file(url, target_path):
+        # support Google Drive share links
+        if 'drive.google.com' in url:
+            # convert to direct download if possible
+            parsed = urllib.parse.urlparse(url)
+            if '/file/d/' in parsed.path:
+                file_id = parsed.path.split('/file/d/')[1].split('/')[0]
+                url = f'https://drive.google.com/uc?export=download&id={file_id}'
+
+        resp = requests.get(url, stream=True, timeout=60)
+        resp.raise_for_status()
+        with open(target_path, 'wb') as f:
+            for chunk in resp.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+
     for path in DATASET_PATHS:
         if path.exists():
             try:
@@ -49,6 +67,21 @@ def load_dataset():
             except Exception as e:
                 st.warning(f"Error loading dataset from {path}: {e}")
                 return None
+
+    # Not found locally — attempt to download from environment-provided URL
+    data_url = os.environ.get('DATASET_URL') or os.environ.get('CREDITCARD_URL')
+    if data_url:
+        target = PROJECT_DIR / 'creditcard.csv'
+        try:
+            st.info('Dataset not found locally — downloading from provided URL...')
+            _download_file(data_url, target)
+            df = pd.read_csv(target)
+            st.success('Dataset downloaded successfully.')
+            return df
+        except Exception as e:
+            st.warning(f"Failed to download dataset from {data_url}: {e}")
+            return None
+
     return None
 
 
