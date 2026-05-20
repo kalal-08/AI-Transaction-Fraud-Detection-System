@@ -77,10 +77,18 @@ def load_dataset():
 
         if 'drive.google.com' in url and _is_html_response(resp):
             text = resp.text
-            token_match = re.search(r'confirm=([0-9A-Za-z_\-]+)&', text)
-            if token_match:
-                confirm_token = token_match.group(1)
-                url = f'{url}&confirm={confirm_token}'
+            action_match = re.search(r'<form[^>]+action="([^"]+)"', text)
+            confirm_match = re.search(r'name="confirm"\s+value="([^"]+)"', text)
+            id_match = re.search(r'name="id"\s+value="([^"]+)"', text)
+            export_match = re.search(r'name="export"\s+value="([^"]+)"', text)
+            if action_match and confirm_match and id_match and export_match:
+                action_url = action_match.group(1)
+                confirm_token = confirm_match.group(1)
+                file_id = id_match.group(1)
+                export_value = export_match.group(1)
+                if action_url.startswith('/'):
+                    action_url = urllib.parse.urljoin('https://drive.google.com', action_url)
+                url = f'{action_url}?id={file_id}&export={export_value}&confirm={confirm_token}'
                 resp = session.get(url, stream=True, timeout=60)
 
         resp.raise_for_status()
