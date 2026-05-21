@@ -297,7 +297,6 @@ This project is provided as-is for educational and demonstration purposes.
 This application is designed to be:
 - ✅ **Beginner-friendly**: Clear explanations and documentation
 - ✅ **Production-ready**: Proper error handling and validation
-- ✅ **CV-worthy**: Professional structure and code quality
 - ✅ **Extensible**: Easy to add new features or models
 
 ## 📧 Feedback & Support
